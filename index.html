@@ -1021,7 +1021,8 @@
 
     /* ── PRINT / SAVE AS PDF ── */
     @media print {
-      #gate, #downloadBtn { display: none !important; }
+      #gate { display: none !important; position: static !important; height: 0 !important; overflow: hidden !important; }
+      #downloadBtn { display: none !important; }
       .sticky-top { position: static !important; box-shadow: none !important; }
       nav { display: none !important; }
       .period-bar { position: static !important; }
