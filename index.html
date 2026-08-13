@@ -996,7 +996,51 @@
       footer { padding: 32px 16px !important; }
     }
 
-</style>
+
+    /* ── DOWNLOAD BUTTON ── */
+    #downloadBtn {
+      padding: 7px 18px;
+      background: var(--red);
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      font-family: 'Barlow', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.15s;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+    #downloadBtn:hover { background: #c41d1a; }
+    @media (max-width: 650px) {
+      #downloadBtn { display: none; }
+    }
+
+    /* ── PRINT / SAVE AS PDF ── */
+    @media print {
+      #gate, #downloadBtn { display: none !important; }
+      .sticky-top { position: static !important; box-shadow: none !important; }
+      nav { display: none !important; }
+      .period-bar { position: static !important; }
+      .section {
+        scroll-margin-top: 0 !important;
+        break-inside: avoid;
+        page-break-inside: avoid;
+        padding: 28px 32px;
+      }
+      .kpi-card, .rate-card, .chart-wrap { break-inside: avoid; page-break-inside: avoid; }
+      .section-sep { display: none !important; }
+      footer { break-inside: avoid; page-break-inside: avoid; }
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+    }
+
+  </style>
 </head>
 <body>
 
@@ -1034,6 +1078,7 @@
     MÍDIA WI-FI · TRANSPORTE · SÃO PAULO<br>
     RELATÓRIO DE PERFORMANCE · 13/08/2026
   </div>
+  <button id="downloadBtn" onclick="window.print()">Baixar PDF</button>
 </header>
 
 <nav>
@@ -1546,7 +1591,7 @@
   </div>
 </section>
 <footer>
-  <p><span class="red-dot"></span>Campanhas ativas · última atualização 12/08/2026</p>
+  <p><span class="red-dot"></span>Campanhas ativas · última atualização 13/08/2026</p>
   <p>Trackfy · V&amp;G Consultoria de Negócios Digitais LTDA · CNPJ 61.819.497/0001-69</p>
 </footer>
 
