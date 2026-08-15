@@ -2077,7 +2077,7 @@
 (function(){
   var badge=document.createElement('div');
   badge.id='upd-badge';
-  badge.style.cssText='position:fixed;bottom:20px;right:20px;z-index:9999;background:#111;color:#fff;font-family:"IBM Plex Mono",monospace;font-size:11px;padding:9px 14px;border-radius:4px;border:1px solid #2a2a2a;box-shadow:0 2px 12px rgba(0,0,0,.45);line-height:1.7;text-align:right;';
+  badge.style.cssText='position:fixed;top:0;left:0;right:0;z-index:9999;background:#111;color:#fff;font-family:"IBM Plex Mono",monospace;font-size:11px;padding:6px 20px;border-bottom:1px solid #2a2a2a;box-shadow:0 2px 8px rgba(0,0,0,.4);text-align:center;';
   document.body.appendChild(badge);
   function pad(n){return String(n).padStart(2,'0');}
   function tick(){
@@ -2089,7 +2089,7 @@
     var diff=Math.max(0,Math.floor((next-now)/1000));
     var mm=pad(Math.floor(diff/60)),ss=pad(diff%60);
     var brt=new Date(upd.getTime()-3*3600*1000);
-    badge.innerHTML='&#9679; Atualizado às '+pad(brt.getUTCHours())+':'+pad(brt.getUTCMinutes())+' BRT<br>Próxima em <b>'+mm+':'+ss+'</b>';
+    badge.innerHTML='&#9679; Atualizado às '+pad(brt.getUTCHours())+':'+pad(brt.getUTCMinutes())+' BRT &nbsp;·&nbsp; Próxima atualização em <b>'+mm+':'+ss+'</b>';
     badge.style.borderColor=diff<60?'#E52420':'#2a2a2a';
   }
   tick();setInterval(tick,1000);
