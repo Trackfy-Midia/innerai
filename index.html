@@ -2276,5 +2276,32 @@
   })();
 </script>
 
+
+<!-- AUTO-GENERATED por update.py -->
+<script id="ds">window._DS={};</script>
+
+<script>
+(function(){
+  var badge=document.createElement('div');
+  badge.id='upd-badge';
+  badge.style.cssText='position:fixed;bottom:20px;right:20px;z-index:9999;background:#111;color:#fff;font-family:"IBM Plex Mono",monospace;font-size:11px;padding:9px 14px;border-radius:4px;border:1px solid #2a2a2a;box-shadow:0 2px 12px rgba(0,0,0,.45);line-height:1.7;text-align:right;';
+  document.body.appendChild(badge);
+  function pad(n){return String(n).padStart(2,'0');}
+  function tick(){
+    var D=window._DS;
+    if(!D||!D.updated_at){badge.innerHTML='<span style="color:#888">aguardando dados…</span>';return;}
+    var upd=new Date(D.updated_at);
+    var next=new Date(upd);next.setUTCHours(next.getUTCHours()+1,0,0,0);
+    var now=new Date();
+    var diff=Math.max(0,Math.floor((next-now)/1000));
+    var mm=pad(Math.floor(diff/60)),ss=pad(diff%60);
+    var brt=new Date(upd.getTime()-3*3600*1000);
+    badge.innerHTML='&#9679; Atualizado às '+pad(brt.getUTCHours())+':'+pad(brt.getUTCMinutes())+' BRT<br>Próxima em <b>'+mm+':'+ss+'</b>';
+    badge.style.borderColor=diff<60?'#E52420':'#2a2a2a';
+  }
+  tick();setInterval(tick,1000);
+})();
+</script>
+
 </body>
 </html>
