@@ -66,6 +66,30 @@ def get_ai_sub(c):
 
 
 # ── API ──────────────────────────────────────────────────────
+def _get_with_retry(url, headers, params=None, max_retries=4, timeout=90):
+    """GET com retry exponencial em caso de timeout ou erro 5xx."""
+    for attempt in range(max_retries):
+        try:
+            r = requests.get(url, headers=headers, params=params, timeout=timeout)
+            r.raise_for_status()
+            return r
+        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
+            wait = 15 * (2 ** attempt)
+            print(f"  [retry {attempt+1}/{max_retries}] {type(e).__name__} — aguardando {wait}s")
+            if attempt == max_retries - 1:
+                raise
+            time.sleep(wait)
+        except requests.exceptions.HTTPError as e:
+            if e.response is not None and e.response.status_code >= 500:
+                wait = 15 * (2 ** attempt)
+                print(f"  [retry {attempt+1}/{max_retries}] HTTP {e.response.status_code} — aguardando {wait}s")
+                if attempt == max_retries - 1:
+                    raise
+                time.sleep(wait)
+            else:
+                raise
+
+
 def fetch_qualified(start: date, end: date) -> list:
     """Retorna lista de dicts {date, ai_sub, wifire_id} para qualificados no período."""
     h = get_headers()
@@ -78,8 +102,7 @@ def fetch_qualified(start: date, end: date) -> list:
     }
     result, page = [], 0
     while url:
-        r = requests.get(url, headers=h, params=params if page == 0 else None, timeout=30)
-        r.raise_for_status()
+        r = _get_with_retry(url, h, params=params if page == 0 else None)
         data = r.json()
         for c in data.get("data", []):
             if not is_qualified(c):
@@ -561,32 +584,34 @@ def main():
         fetch_start = CAMPAIGN_START
         print(f"[sync completo] {fetch_start} → {today}")
 
-    customers = fetch_qualified(fetch_start, today)
-    print(f"  {len(customers)} qualificados no período {fetch_start} → {today}")
+    api_ok = True
+    try:
+        customers = fetch_qualified(fetch_start, today)
+        print(f"  {len(customers)} qualificados no período {fetch_start} → {today}")
+    except Exception as e:
+        print(f"  [AVISO] API indisponível — usando dados armazenados. Erro: {e}")
+        api_ok = False
+        customers = []
 
-    # Merge counts: re-count each day in the fetch window (substitui totais parciais)
-    new_counts: dict = {}
-    for c in customers:
-        ds = c["date"]
-        new_counts[ds] = new_counts.get(ds, 0) + 1
+    if api_ok:
+        # Merge counts: re-count each day in the fetch window (substitui totais parciais)
+        new_counts: dict = {}
+        for c in customers:
+            ds = c["date"]
+            new_counts[ds] = new_counts.get(ds, 0) + 1
 
-    counts = dict(state.get("counts", {}))
-    for ds, n in new_counts.items():
-        counts[ds] = n  # substitui (re-count completo do período)
+        counts = dict(state.get("counts", {}))
+        for ds, n in new_counts.items():
+            counts[ds] = n
 
-    state["counts"] = counts
-    state["last_sync_date"] = today.isoformat()
+        state["counts"] = counts
+        state["last_sync_date"] = today.isoformat()
 
-    # Segmentação: atualiza se fetch cobriu início da campanha
-    if fetch_start <= CAMPAIGN_START:
-        state["seg"] = {
-            "yes": sum(1 for c in customers if c["ai_sub"] is True),
-            "no":  sum(1 for c in customers if c["ai_sub"] is False),
-        }
-    else:
-        # Incremental: adiciona delta de segmentação do período novo
-        # (aproximação; full recalc feito quando a data muda no próximo dia)
-        pass
+        if fetch_start <= CAMPAIGN_START:
+            state["seg"] = {
+                "yes": sum(1 for c in customers if c["ai_sub"] is True),
+                "no":  sum(1 for c in customers if c["ai_sub"] is False),
+            }
 
     save_state(state)
 
