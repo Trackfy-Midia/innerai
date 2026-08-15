@@ -100,10 +100,11 @@ def fetch_qualified(start: date, end: date) -> list:
         "finalPeriod":   end.isoformat(),
         "limit":         100,
     }
-    result, page = [], 0
+    result, page, dry_pages = [], 0, 0
     while url:
         r = _get_with_retry(url, h, params=params if page == 0 else None)
         data = r.json()
+        added = 0
         for c in data.get("data", []):
             if not is_qualified(c):
                 continue
@@ -111,7 +112,12 @@ def fetch_qualified(start: date, end: date) -> list:
             if not d or d < CAMPAIGN_START.isoformat() or d > end.isoformat():
                 continue
             result.append({"date": d, "ai_sub": get_ai_sub(c), "id": c.get("id")})
+            added += 1
         page += 1
+        dry_pages = 0 if added else dry_pages + 1
+        if dry_pages >= 15:
+            print(f"  [early stop] {dry_pages} páginas sem novos leads — encerrando na pág {page}")
+            break
         url = data.get("nextpage")
         if url:
             time.sleep(6)  # respeita rate limit 10 req/min
@@ -572,10 +578,11 @@ def main():
     last  = state.get("last_sync_date")
 
     # Determine fetch window
-    if last and last == today.isoformat():
-        # Mesmo dia: só pega hoje (fast)
+    same_day = last and last == today.isoformat()
+    if same_day:
+        # Mesmo dia: busca só quem acessou hoje e registrou hoje
         fetch_start = today
-        print(f"[sync parcial] {fetch_start} (mesmo dia)")
+        print(f"[sync parcial] {fetch_start} (mesmo dia — só conta novos de hoje)")
     elif last:
         # Novo dia: pega desde ontem (sobreposição de 1 dia)
         fetch_start = date.fromisoformat(last) - timedelta(days=1)
@@ -594,15 +601,20 @@ def main():
         customers = []
 
     if api_ok:
-        # Merge counts: re-count each day in the fetch window (substitui totais parciais)
-        new_counts: dict = {}
-        for c in customers:
-            ds = c["date"]
-            new_counts[ds] = new_counts.get(ds, 0) + 1
-
         counts = dict(state.get("counts", {}))
-        for ds, n in new_counts.items():
-            counts[ds] = n
+
+        if same_day:
+            # Parcial: só atualiza o count de hoje; dias anteriores ficam intactos
+            today_str = today.isoformat()
+            counts[today_str] = sum(1 for c in customers if c["date"] == today_str)
+        else:
+            # Full/incremental: substitui todos os dias do período buscado
+            new_counts: dict = {}
+            for c in customers:
+                ds = c["date"]
+                new_counts[ds] = new_counts.get(ds, 0) + 1
+            for ds, n in new_counts.items():
+                counts[ds] = n
 
         state["counts"] = counts
         state["last_sync_date"] = today.isoformat()
