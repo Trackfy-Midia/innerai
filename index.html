@@ -1043,7 +1043,7 @@
 
   </style>
 </head>
-<body data-updated-at="2026-08-16T20:30:28Z" data-updated-at="2026-08-15T20:13:29Z">
+<body data-updated-at="2026-08-16T21:27:01Z" data-updated-at="2026-08-15T20:13:29Z">
 
 <div id="gate">
   <div class="gate-box">
@@ -1120,7 +1120,7 @@
   <div class="kpi-grid cols-3" style="margin-top:28px;">
     <div class="kpi-card">
       <div class="kpi-label">Qualificados entregues</div>
-      <div class="kpi-value">1.722</div>
+      <div class="kpi-value">1.732</div>
       <div class="kpi-desc">desde 06/08/2026 — Nível 01 (Aceito + Contato email ou telefone) · 16/08 em andamento</div>
     </div>
     <div class="kpi-card">
@@ -1130,22 +1130,22 @@
     </div>
     <div class="kpi-card accent">
       <div class="kpi-label">Leads em aberto</div>
-      <div class="kpi-value red">8.278</div>
+      <div class="kpi-value red">8.268</div>
       <div class="kpi-desc">necessários para cumprir o contrato</div>
     </div>
   </div>
 
   <div class="progress-wrap">
     <div class="progress-header">
-      <span class="progress-pct">17,2%</span>
+      <span class="progress-pct">17,3%</span>
       <span class="progress-note">10 dias rodando · 20 dias restantes</span>
     </div>
     <div class="progress-track">
-      <div class="progress-fill" style="width:17.22%"></div>
+      <div class="progress-fill" style="width:17.32%"></div>
     </div>
     <div class="progress-labels">
       <span>0</span>
-      <span>1.722 entregues</span>
+      <span>1.732 entregues</span>
       <span>10.000 meta</span>
     </div>
   </div>
@@ -1161,7 +1161,7 @@
     </div>
     <div class="rate-card alert">
       <div class="rate-card-label">Ritmo necessário agora</div>
-      <div class="rate-card-value red">414 <span class="rate-card-unit">qualif./dia</span></div>
+      <div class="rate-card-value red">413 <span class="rate-card-unit">qualif./dia</span></div>
     </div>
   </div>
 
@@ -1314,7 +1314,7 @@
     <div class="chart-legend">
       <div class="legend-item"><div class="legend-line" style="background:#111111;"></div>Realizado</div>
       <div class="legend-item"><div class="legend-line" style="background:repeating-linear-gradient(90deg,#D4820A 0,#D4820A 6px,transparent 6px,transparent 10px);"></div>Projeção ritmo atual (165/dia)</div>
-      <div class="legend-item"><div class="legend-line" style="background:repeating-linear-gradient(90deg,#E52420 0,#E52420 6px,transparent 6px,transparent 10px);"></div>Ritmo necessário (414/dia)</div>
+      <div class="legend-item"><div class="legend-line" style="background:repeating-linear-gradient(90deg,#E52420 0,#E52420 6px,transparent 6px,transparent 10px);"></div>Ritmo necessário (413/dia)</div>
       <div class="legend-item"><div class="legend-line" style="background:repeating-linear-gradient(90deg,#AAAAAA 0,#AAAAAA 3px,transparent 3px,transparent 7px);"></div>Meta contratada (333/dia)</div>
     </div>
   </div>
@@ -1341,7 +1341,7 @@
       <tr><td>13/08<span class="weekday">qui</span></td><td>348</td><td class="num-main">348</td><td>1.133</td><td>2.664</td><td class="gap">−1.531</td></tr>
       <tr><td>14/08<span class="weekday">sex</span></td><td>315</td><td class="num-main">315</td><td>1.448</td><td>2.997</td><td class="gap">−1.549</td></tr>
       <tr><td>15/08<span class="weekday">sáb</span></td><td>198</td><td class="num-main">198</td><td>1.646</td><td>3.330</td><td class="gap">−1.684</td></tr>
-      <tr class="partial"><td>16/08<span class="weekday">dom</span><span class="partial-badge">parcial</span></td><td>76</td><td class="num-main">76</td><td>1.722</td><td>3.663</td><td class="gap">−1.941</td></tr>
+      <tr class="partial"><td>16/08<span class="weekday">dom</span><span class="partial-badge">parcial</span></td><td>86</td><td class="num-main">86</td><td>1.732</td><td>3.663</td><td class="gap">−1.931</td></tr>
     </tbody>
     <tfoot>
       <tr><td colspan="6">* 16/08 dia em andamento — dados até horário de geração</td></tr>
@@ -2070,7 +2070,7 @@
     ];
 
     // Cumulative qualified leads — actual (Nível 01)
-    const ACTUAL = [62,119,182,242,329,519,785,1133,1448,1646,1722,
+    const ACTUAL = [62,119,182,242,329,519,785,1133,1448,1646,1732,
       null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null];
 
     // Projection at current avg (161/day) from index 9
@@ -2082,7 +2082,7 @@
     // Needed pace (406/day) from index 9 to reach 10k
     const PROJ_NEED = DAYS.map(function(_,i){
       if(i < 10) return null;
-      return Math.min(1646 + (i-10)*414, 10000);
+      return Math.min(1646 + (i-10)*413, 10000);
     });
 
     // Meta (333/day from day 1)
@@ -2119,7 +2119,7 @@
             spanGaps: false
           },
           {
-            label: 'Ritmo necessário (414/dia)',
+            label: 'Ritmo necessário (413/dia)',
             data: PROJ_NEED,
             borderColor: '#E52420',
             borderWidth: 1.5,
@@ -2198,7 +2198,7 @@
     if (!ctx) return;
 
     const labels = ['06/08','07/08','08/08','09/08','10/08','11/08','12/08','13/08','14/08','15/08','16/08'];
-    const values = [62,57,63,60,87,190,266,348,315,198,76];
+    const values = [62,57,63,60,87,190,266,348,315,198,86];
     const isPhase2 = [false,false,false,false,false,true,true,true,true,true,true];
 
     new Chart(ctx, {
@@ -2278,7 +2278,7 @@
 
 
 <!-- AUTO-GENERATED por update.py -->
-<script id="ds">window._DS={"updated_at":"2026-08-16T20:30:28Z","header_date":"16/08/2026","period_value":"06/08 — 16/08/2026","period_label":"11 dias · dados até 16/08 (parcial)","total":1722,"total_fmt":"1.722","kpi_desc":"desde 06/08/2026 — Nível 01 (Aceito + Contato email ou telefone) · 16/08 em andamento","remaining_fmt":"8.278","pct_fmt":"17,2%","pct_raw":17.22,"progress_fill":"17.22%","progress_note":"11 dias rodando · 20 dias restantes","progress_label":"1.722 entregues","avg_current":165,"ritmo_nec":414,"phase2_label":"11 a 15/08","phase2_avg":263,"phase2_desc":"11-15/08 completos · 16/08 em andamento","growth_fmt":"+300%","growth_desc":"fase 2 vs. fase 1 · 4.0× de aceleração","no_fmt":"953","no_pct":"64,5%","yes_fmt":"524","yes_pct":"35,5%","bar_no_w":"64.5%","bar_yes_w":"35.5%","last_ci":9,"proj_base":1646,"avg_rate":165,"nec_rate":414,"actual":[62,119,182,242,329,519,785,1133,1448,1646,1722],"accel_labels":["06/08","07/08","08/08","09/08","10/08","11/08","12/08","13/08","14/08","15/08","16/08"],"accel_values":[62,57,63,60,87,190,266,348,315,198,76],"is_phase2":[false,false,false,false,false,true,true,true,true,true,true],"meta_line":[333,333,333,333,333,333,333,333,333,333,333],"timeline":[{"date":"2026-08-06","daily":62,"cumulative":62,"meta_acc":333,"gap":-271,"partial":false},{"date":"2026-08-07","daily":57,"cumulative":119,"meta_acc":666,"gap":-547,"partial":false},{"date":"2026-08-08","daily":63,"cumulative":182,"meta_acc":999,"gap":-817,"partial":false},{"date":"2026-08-09","daily":60,"cumulative":242,"meta_acc":1332,"gap":-1090,"partial":false},{"date":"2026-08-10","daily":87,"cumulative":329,"meta_acc":1665,"gap":-1336,"partial":false},{"date":"2026-08-11","daily":190,"cumulative":519,"meta_acc":1998,"gap":-1479,"partial":false},{"date":"2026-08-12","daily":266,"cumulative":785,"meta_acc":2331,"gap":-1546,"partial":false},{"date":"2026-08-13","daily":348,"cumulative":1133,"meta_acc":2664,"gap":-1531,"partial":false},{"date":"2026-08-14","daily":315,"cumulative":1448,"meta_acc":2997,"gap":-1549,"partial":false},{"date":"2026-08-15","daily":198,"cumulative":1646,"meta_acc":3330,"gap":-1684,"partial":false},{"date":"2026-08-16","daily":76,"cumulative":1722,"meta_acc":3663,"gap":-1941,"partial":true}],"days_elapsed":11,"days_rem":20};</script>
+<script id="ds">window._DS={"updated_at":"2026-08-16T21:27:01Z","header_date":"16/08/2026","period_value":"06/08 — 16/08/2026","period_label":"11 dias · dados até 16/08 (parcial)","total":1732,"total_fmt":"1.732","kpi_desc":"desde 06/08/2026 — Nível 01 (Aceito + Contato email ou telefone) · 16/08 em andamento","remaining_fmt":"8.268","pct_fmt":"17,3%","pct_raw":17.32,"progress_fill":"17.32%","progress_note":"11 dias rodando · 20 dias restantes","progress_label":"1.732 entregues","avg_current":165,"ritmo_nec":413,"phase2_label":"11 a 15/08","phase2_avg":263,"phase2_desc":"11-15/08 completos · 16/08 em andamento","growth_fmt":"+300%","growth_desc":"fase 2 vs. fase 1 · 4.0× de aceleração","no_fmt":"953","no_pct":"64,5%","yes_fmt":"524","yes_pct":"35,5%","bar_no_w":"64.5%","bar_yes_w":"35.5%","last_ci":9,"proj_base":1646,"avg_rate":165,"nec_rate":413,"actual":[62,119,182,242,329,519,785,1133,1448,1646,1732],"accel_labels":["06/08","07/08","08/08","09/08","10/08","11/08","12/08","13/08","14/08","15/08","16/08"],"accel_values":[62,57,63,60,87,190,266,348,315,198,86],"is_phase2":[false,false,false,false,false,true,true,true,true,true,true],"meta_line":[333,333,333,333,333,333,333,333,333,333,333],"timeline":[{"date":"2026-08-06","daily":62,"cumulative":62,"meta_acc":333,"gap":-271,"partial":false},{"date":"2026-08-07","daily":57,"cumulative":119,"meta_acc":666,"gap":-547,"partial":false},{"date":"2026-08-08","daily":63,"cumulative":182,"meta_acc":999,"gap":-817,"partial":false},{"date":"2026-08-09","daily":60,"cumulative":242,"meta_acc":1332,"gap":-1090,"partial":false},{"date":"2026-08-10","daily":87,"cumulative":329,"meta_acc":1665,"gap":-1336,"partial":false},{"date":"2026-08-11","daily":190,"cumulative":519,"meta_acc":1998,"gap":-1479,"partial":false},{"date":"2026-08-12","daily":266,"cumulative":785,"meta_acc":2331,"gap":-1546,"partial":false},{"date":"2026-08-13","daily":348,"cumulative":1133,"meta_acc":2664,"gap":-1531,"partial":false},{"date":"2026-08-14","daily":315,"cumulative":1448,"meta_acc":2997,"gap":-1549,"partial":false},{"date":"2026-08-15","daily":198,"cumulative":1646,"meta_acc":3330,"gap":-1684,"partial":false},{"date":"2026-08-16","daily":86,"cumulative":1732,"meta_acc":3663,"gap":-1931,"partial":true}],"days_elapsed":11,"days_rem":20};</script>
 
 <script>
 (function(){
