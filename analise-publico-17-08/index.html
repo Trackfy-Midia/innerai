@@ -565,7 +565,7 @@
 
 <!-- NAV -->
 <nav>
-  <a href="#diagnostico" class="active">Diagnóstico</a>
+  <a href="#diagnostico">Diagnóstico</a>
   <a href="#campanha">Dados da Campanha</a>
   <a href="#publico">Perfil do Público</a>
   <a href="#mercado">Contexto de Mercado</a>
@@ -849,6 +849,36 @@
   </div>
   <p>ANÁLISE DE PÚBLICO: INNER AI × BARRA FUNDA · 17/08/2026<br>DADOS: TRACKFY-MIDIA.GITHUB.IO/INNERAI · LP.INNERAI.COM/NOSSOS-PLANOS-TF</p>
 </footer>
+<script>
+(function(){
+  var navLinks = document.querySelectorAll('nav a');
+  var sections = Array.from(navLinks).map(function(a){
+    return document.querySelector(a.getAttribute('href'));
+  });
+
+  function setActive(id){
+    navLinks.forEach(function(a){
+      a.classList.toggle('active', a.getAttribute('href') === '#' + id);
+    });
+  }
+
+  // Click: marca imediatamente o item clicado
+  navLinks.forEach(function(a){
+    a.addEventListener('click', function(){
+      setActive(a.getAttribute('href').slice(1));
+    });
+  });
+
+  // Scroll spy via IntersectionObserver
+  var observer = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting) setActive(entry.target.id);
+    });
+  }, { rootMargin: '-40px 0px -60% 0px', threshold: 0 });
+
+  sections.forEach(function(s){ if(s) observer.observe(s); });
+})();
+</script>
 
 </body>
 </html>
