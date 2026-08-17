@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trackfy — Análise de Público Inner AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:       #F0EDE8;
+    --surface:  #E8E4DE;
+    --surface2: #DDD9D3;
+    --border:   #CECCCA;
+    --black:    #111111;
+    --red:      #E52420;
+    --red-dim:  rgba(229,36,32,0.07);
+    --red-mid:  rgba(229,36,32,0.18);
+    --muted:    #888880;
+    --dim:      #666660;
+    --white:    #ffffff;
+  }
+
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--black);
+    font-family: 'Barlow', sans-serif;
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo {
+    display: flex; align-items: center; gap: 10px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700; font-size: 20px;
+  }
+  .logo-bars { display:flex; gap:2px; align-items:flex-end; }
+  .logo-bar  { width:4px; background:var(--red); }
+  .logo-bar:nth-child(1) { height:14px; }
+  .logo-bar:nth-child(2) { height:10px; }
+  .header-meta {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; color: var(--muted);
+    letter-spacing: 0.07em; text-align:right; line-height:1.9;
+  }
+
+  /* ── PERIOD BAR ── */
+  .period-bar {
+    background: var(--black);
+    padding: 10px 48px;
+    display: flex; align-items: center;
+    justify-content: space-between; gap:24px; flex-wrap:wrap;
+  }
+  .period-item { display:flex; align-items:center; gap:10px; }
+  .period-label {
+    font-size: 10px; font-weight:600;
+    letter-spacing:0.08em; text-transform:uppercase;
+    color: rgba(255,255,255,0.7);
+  }
+  .period-value {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 14px; font-weight:700; color:#fff; letter-spacing:0.02em;
+  }
+  .period-dot { width:1px; height:16px; background:rgba(255,255,255,0.15); }
+
+  /* ── NAV ── */
+  nav {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 0 48px;
+    display: flex; gap:0;
+    position: sticky; top:0; z-index:100;
+  }
+  nav a {
+    font-size: 12px; font-weight:500; letter-spacing:0.04em;
+    color: var(--muted); text-decoration:none;
+    padding: 12px 20px 11px;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  nav a:hover { color: var(--black); }
+  nav a.active { color: var(--red); border-bottom-color: var(--red); }
+  nav a:first-child { padding-left:0; }
+
+  /* ── DIVIDER RED ── */
+  .divider-red {
+    width:100%; height:3px;
+    background: linear-gradient(90deg, var(--red) 0%, transparent 55%);
+  }
+
+  /* ── SECTION ── */
+  .section {
+    padding: 44px 48px;
+    border-bottom: 1px solid var(--border);
+    scroll-margin-top: 45px;
+  }
+  .section.white  { background: var(--white); }
+  .section.tinted { background: var(--bg); }
+  .section.dark   { background: var(--black); }
+
+  /* ── LABEL TAG ── */
+  .label-tag {
+    font-size: 11px; font-weight:600;
+    letter-spacing:0.08em; text-transform:uppercase;
+    color: var(--red); margin-bottom:18px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .label-tag::before {
+    content:''; display:inline-block;
+    width:12px; height:2px; background:var(--red); flex-shrink:0;
+  }
+
+  /* ── HERO ── */
+  .hero-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-size: clamp(36px, 4vw, 58px);
+    line-height: 0.95;
+    text-transform: uppercase;
+    letter-spacing: -0.5px;
+    margin-bottom: 14px;
+  }
+  .hero-title em { color: var(--red); font-style:normal; }
+  .hero-sub {
+    font-size: 14px; font-weight:500; color: var(--muted);
+    letter-spacing:0.02em; max-width: 560px;
+  }
+  .hero-tags {
+    display:flex; gap:10px; flex-wrap:wrap; margin-top:20px;
+  }
+  .tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; font-weight:500;
+    letter-spacing:0.06em; text-transform:uppercase;
+    padding: 5px 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--dim);
+  }
+
+  /* ── ALERT BOX ── */
+  .alert-box {
+    border-left: 3px solid var(--red);
+    padding: 16px 20px;
+    background: var(--red-dim);
+    margin-bottom: 20px;
+  }
+  .alert-box.dark-alert {
+    background: var(--black);
+    border-left-color: var(--red);
+  }
+  .alert-box.warn {
+    border-left-color: var(--dim);
+    background: var(--surface);
+  }
+  .alert-box strong {
+    display:block; margin-bottom:6px;
+    font-size: 12px; font-weight:600;
+    letter-spacing:0.04em; text-transform:uppercase;
+    color: var(--red);
+  }
+  .alert-box.dark-alert strong { color: var(--red); }
+  .alert-box.warn strong { color: var(--dim); }
+  .alert-box p { font-size:14px; color: var(--black); }
+  .alert-box.dark-alert p { color:rgba(255,255,255,0.85); }
+
+  /* ── KPI GRID ── */
+  .kpi-grid {
+    display:grid; gap:14px; margin-top:28px;
+  }
+  .kpi-grid.cols-3 { grid-template-columns: repeat(3,1fr); }
+  .kpi-grid.cols-4 { grid-template-columns: repeat(4,1fr); }
+  .kpi-grid.cols-2 { grid-template-columns: repeat(2,1fr); }
+
+  .kpi-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    padding: 22px 20px;
+  }
+  .kpi-card.accent  { background: var(--red-dim); border-color: rgba(229,36,32,.22); }
+  .kpi-card.dark    { background: var(--black); }
+  .kpi-card.surface { background: var(--surface); }
+
+  .kpi-label {
+    font-size: 11px; font-weight:500; letter-spacing:0.04em;
+    color: var(--muted); margin-bottom:8px;
+  }
+  .kpi-card.dark .kpi-label { color: rgba(255,255,255,0.7); }
+
+  .kpi-value {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: clamp(28px,3vw,44px);
+    line-height:1; letter-spacing:-0.3px;
+  }
+  .kpi-value.red   { color: var(--red); }
+  .kpi-value.white { color: #fff; }
+  .kpi-value.dim   { color: var(--dim); }
+
+  .kpi-desc {
+    font-size: 12px; color: var(--muted); margin-top:6px;
+  }
+  .kpi-card.dark .kpi-desc { color: rgba(255,255,255,0.7); }
+
+  /* ── RATE CARD ── */
+  .rate-card {
+    padding: 18px 20px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    position:relative;
+  }
+  .rate-card.alert-card {
+    border-color: var(--red); border-width:2px;
+  }
+  .rate-card.alert-card::before {
+    content:'DÉFICIT';
+    position:absolute; top:-1px; right:-1px;
+    background: var(--red); color:#fff;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size:9px; font-weight:600;
+    letter-spacing:0.12em; padding: 3px 8px;
+  }
+  .rate-label {
+    font-size: 12px; font-weight:500; color:var(--muted);
+    letter-spacing:0.02em; margin-bottom:7px;
+  }
+  .rate-value {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight:700; font-size:32px; line-height:1;
+  }
+  .rate-value.red { color: var(--red); }
+  .rate-unit {
+    font-weight:400; font-size:14px;
+    color:var(--muted); margin-left:3px;
+  }
+
+  /* ── PROGRESS ── */
+  .progress-wrap { margin-top:24px; }
+  .progress-header {
+    display:flex; justify-content:space-between;
+    align-items:baseline; margin-bottom:10px;
+  }
+  .progress-pct {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight:700; font-size:30px; color:var(--red); line-height:1;
+  }
+  .progress-note { font-size:12px; color:var(--muted); }
+  .progress-track {
+    width:100%; height:5px; background:var(--surface); position:relative;
+  }
+  .progress-fill {
+    height:100%; background:var(--red); position:relative;
+  }
+  .progress-fill::after {
+    content:''; position:absolute; right:-1px; top:-3px;
+    width:2px; height:11px; background:var(--red);
+  }
+  .progress-labels {
+    display:flex; justify-content:space-between; margin-top:6px;
+  }
+  .progress-labels span {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size:10px; color:var(--muted);
+  }
+
+  /* ── SEG BAR ── */
+  .seg-bar {
+    display:flex; height:32px; margin:14px 0;
+  }
+  .seg-bar .seg {
+    display:flex; align-items:center; justify-content:center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size:13px; font-weight:700; color:#fff;
+    letter-spacing:0.03em;
+  }
+  .seg-black { background: var(--black); }
+  .seg-red   { background: var(--red); }
+  .seg-dim   { background: var(--dim); }
+
+  /* ── TABLE ── */
+  .table-wrap { overflow-x:auto; margin-top:24px; }
+  table { width:100%; border-collapse:collapse; }
+  th {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size:10px; font-weight:500;
+    letter-spacing:0.08em; text-transform:uppercase;
+    color:var(--muted); text-align:left;
+    padding: 8px 12px;
+    border-bottom: 2px solid var(--border);
+    background: var(--surface);
+  }
+  td {
+    padding: 9px 12px;
+    font-size:13px;
+    border-bottom: 1px solid var(--border);
+    vertical-align:middle;
+  }
+  tr.phase-break td { border-top:2px solid var(--black); }
+  tr:last-child td { border-bottom:none; }
+  tr:hover td { background: var(--surface); }
+
+  /* ── BADGE ── */
+  .badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; font-weight:600;
+    padding: 2px 7px; letter-spacing:0.06em;
+    text-transform:uppercase;
+  }
+  .badge-red   { background: var(--red-dim); color:var(--red); }
+  .badge-black { background: var(--black); color:#fff; }
+  .badge-dim   { background: var(--surface2); color:var(--dim); }
+  .badge-green { background: rgba(0,100,40,0.08); color:#006428; }
+
+  /* ── TWO-COL ── */
+  .two-col {
+    display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:20px;
+  }
+  @media(max-width:640px) { .two-col { grid-template-columns:1fr; } }
+
+  /* ── CONTENT CARD ── */
+  .content-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    padding: 20px;
+  }
+  .content-card h3 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size:16px; font-weight:700;
+    text-transform:uppercase; letter-spacing:0.04em;
+    margin-bottom:12px;
+  }
+  .content-card ul { padding-left:16px; }
+  .content-card ul li {
+    font-size:13px; color:var(--dim);
+    margin-bottom:7px; line-height:1.5;
+  }
+  .content-card ul li strong { color:var(--black); }
+
+  /* ── PERSONA ── */
+  .persona {
+    background: var(--white);
+    border: 1px solid var(--border);
+    padding: 22px;
+  }
+  .persona-header {
+    border-bottom:1px solid var(--border);
+    padding-bottom:14px; margin-bottom:16px;
+  }
+  .persona-eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size:10px; color:var(--red);
+    letter-spacing:0.08em; text-transform:uppercase;
+    margin-bottom:6px;
+  }
+  .persona-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size:20px; font-weight:700;
+    text-transform:uppercase; line-height:1;
+  }
+  .persona-sub { font-size:12px; color:var(--muted); margin-top:4px; }
+  .persona-grid {
+    display:grid; grid-template-columns:1fr 1fr; gap:12px;
+  }
+  @media(max-width:480px) { .persona-grid { grid-template-columns:1fr; } }
+  .persona-item label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size:9px; font-weight:600;
+    letter-spacing:0.1em; text-transform:uppercase;
+    color:var(--muted); display:block; margin-bottom:3px;
+  }
+  .persona-item p { font-size:13px; color:var(--black); line-height:1.45; }
+
+  /* ── UX ISSUE ── */
+  .ux-list { margin-top:20px; display:flex; flex-direction:column; gap:12px; }
+  .ux-item {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--red);
+    padding: 14px 18px;
+  }
+  .ux-item.ok   { border-left-color: #006428; }
+  .ux-item.warn { border-left-color: var(--dim); }
+  .ux-title {
+    font-family: 'Barlow', sans-serif;
+    font-size:13px; font-weight:600;
+    margin-bottom:5px;
+  }
+  .ux-body { font-size:13px; color:var(--dim); line-height:1.5; }
+
+  /* ── REC ── */
+  .rec-list { display:flex; flex-direction:column; gap:14px; margin-top:20px; }
+  .rec-item {
+    background: var(--white);
+    border: 1px solid var(--border);
+    display:grid; grid-template-columns:48px 1fr;
+    gap:0;
+  }
+  .rec-num {
+    background: var(--black); color:#fff;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size:20px; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  .rec-num.red { background: var(--red); }
+  .rec-body { padding:18px 20px; }
+  .rec-body h3 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size:16px; font-weight:700;
+    text-transform:uppercase; letter-spacing:0.04em;
+    margin-bottom:8px;
+  }
+  .rec-body p { font-size:13px; color:var(--dim); line-height:1.5; }
+  .rec-impact {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size:9px; font-weight:600;
+    letter-spacing:0.1em; text-transform:uppercase;
+    padding: 3px 8px; margin-top:10px; display:inline-block;
+  }
+  .impact-hi  { background:var(--red-dim); color:var(--red); }
+  .impact-mid { background:var(--surface2); color:var(--dim); }
+  .impact-lo  { background:var(--surface); color:var(--muted); }
+
+  /* ── PHASE BLOCK ── */
+  .phase-block {
+    background: var(--white);
+    border: 1px solid var(--border);
+    margin-bottom:14px;
+  }
+  .phase-header {
+    background: var(--surface);
+    padding: 10px 18px;
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .phase-header-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size:13px; font-weight:700;
+    text-transform:uppercase; letter-spacing:0.04em;
+  }
+  .phase-body { padding:18px; }
+  .phase-body ul { padding-left:16px; }
+  .phase-body ul li {
+    font-size:13px; color:var(--dim);
+    margin-bottom:8px; line-height:1.5;
+  }
+  .phase-body ul li strong { color:var(--black); }
+
+  /* ── PRICE GRID ── */
+  .price-grid {
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(150px,1fr));
+    gap:12px; margin:20px 0;
+  }
+  .price-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    padding: 16px; text-align:center;
+  }
+  .price-card.highlight {
+    border-color: var(--red);
+    border-width:2px;
+    background: var(--red-dim);
+  }
+  .price-product {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size:10px; text-transform:uppercase;
+    letter-spacing:0.07em; color:var(--muted); margin-bottom:6px;
+  }
+  .price-val {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size:26px; font-weight:700; line-height:1;
+    margin-bottom:4px;
+  }
+  .price-val.red { color:var(--red); }
+  .price-ctx { font-size:11px; color:var(--muted); line-height:1.4; }
+
+  /* ── SECTION TITLE ── */
+  .s-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight:800; font-size:clamp(22px,2.5vw,32px);
+    text-transform:uppercase; letter-spacing:-0.3px;
+    line-height:1; margin-bottom:20px;
+  }
+  .s-title em { color:var(--red); font-style:normal; }
+
+  /* ── MONO SMALL ── */
+  .mono { font-family:'IBM Plex Mono', monospace; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--black); color: rgba(255,255,255,0.5);
+    padding: 24px 48px;
+    display:flex; justify-content:space-between; align-items:center;
+    flex-wrap:wrap; gap:12px;
+  }
+  footer .f-logo {
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700; font-size:16px; color:#fff;
+    display:flex; align-items:center; gap:8px;
+  }
+  footer p { font-family:'IBM Plex Mono', monospace; font-size:10px; letter-spacing:0.05em; }
+
+  @media(max-width:700px) {
+    header, .period-bar, nav, .section, footer { padding-left:20px; padding-right:20px; }
+    .kpi-grid.cols-3, .kpi-grid.cols-4 { grid-template-columns:1fr 1fr; }
+    .two-col { grid-template-columns:1fr; }
+    .price-grid { grid-template-columns:1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-bars">
+      <div class="logo-bar"></div>
+      <div class="logo-bar"></div>
+    </div>
+    Trackfy
+  </div>
+  <div class="header-meta">
+    RELATÓRIO DE ANÁLISE DE PÚBLICO · 17/08/2026<br>
+    INNER AI × BARRA FUNDA · CAMPANHA CPL
+  </div>
+</header>
+
+<!-- PERIOD BAR -->
+<div class="period-bar">
+  <div class="period-item">
+    <span class="period-label">Campanha</span>
+    <span class="period-value">06/08 — 05/09/2026</span>
+  </div>
+  <div class="period-dot"></div>
+  <div class="period-item">
+    <span class="period-label">Leads qualificados</span>
+    <span class="period-value">2.662 entregues</span>
+  </div>
+  <div class="period-dot"></div>
+  <div class="period-item">
+    <span class="period-label">Meta</span>
+    <span class="period-value">10.000 · R$ 1,00/lead</span>
+  </div>
+  <div class="period-dot"></div>
+  <div class="period-item">
+    <span class="period-label">Dados até</span>
+    <span class="period-value">17/08 (parcial) · 20h33 BRT</span>
+  </div>
+</div>
+
+<div class="divider-red"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#diagnostico" class="active">Diagnóstico</a>
+  <a href="#campanha">Dados da Campanha</a>
+  <a href="#publico">Perfil do Público</a>
+  <a href="#mercado">Contexto de Mercado</a>
+  <a href="#produto">Produto</a>
+</nav>
+
+<!-- ── SEÇÃO 1: DIAGNÓSTICO ── -->
+<div class="section white" id="diagnostico">
+  <div class="label-tag">Diagnóstico Central</div>
+  <div class="s-title">A <em>oportunidade</em> de produto</div>
+
+  <div class="alert-box" style="margin-bottom:16px;">
+    <p>O usuário captado pela campanha do metrô é trabalhador da zona oeste de SP, renda individual estimada em ~R$ 3.200/mês (Pesquisa Caracterização Metrô SP, corrigida IPCA). A Inner AI oferece R$ 49,90 como plano de "entrada" — o equivalente a 40% de todo o envelope de lazer digital desta faixa de renda. O plano Pro a R$ 99,90 está fora de alcance como produto de massa neste canal.</p>
+  </div>
+  <div class="alert-box warn">
+    <strong>A oportunidade real não é eliminar o produto — é criar a porta de entrada certa</strong>
+    <p>66,2% da base não assina nenhuma IA. Isso não é ausência de interesse — é ausência de produto e preço adequados. O captive portal Wi-Fi é canal de aquisição de leads qualificados por intenção (preencheram formulário voluntariamente), mas o funil quebra na conversão porque o destino assume poder de compra que o público não tem. A taxa de conversão de freemium para pago no segmento B2C é de 2%–5% (Paddle/ProfitWell). Sem uma entrada gratuita real, a conversão vai ficar abaixo desse patamar.</p>
+  </div>
+</div>
+
+<!-- ── SEÇÃO 2: DADOS DA CAMPANHA ── -->
+<div class="section tinted" id="campanha">
+  <div class="label-tag">Dados Reais da Campanha</div>
+  <div class="s-title">Performance <em>atual</em></div>
+
+  <div class="kpi-grid cols-3">
+    <div class="kpi-card">
+      <div class="kpi-label">Qualificados entregues</div>
+      <div class="kpi-value">2.662</div>
+      <div class="kpi-desc">desde 06/08 — Nível 01 (Aceito + Contato) · 17/08 em andamento</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Meta contratada</div>
+      <div class="kpi-value dim">10.000</div>
+      <div class="kpi-desc">volume total · CPL R$ 1,00</div>
+    </div>
+    <div class="kpi-card accent">
+      <div class="kpi-label">Leads em aberto</div>
+      <div class="kpi-value red">7.338</div>
+      <div class="kpi-desc">necessários para cumprir o contrato</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── SEÇÃO 3: PERFIL DO PÚBLICO ── -->
+<div class="section white" id="publico">
+  <div class="label-tag">Perfil do Público</div>
+  <div class="s-title">Quem usa o Wi-Fi na <em>Barra Funda</em></div>
+  <p style="font-size:14px;color:var(--dim);max-width:680px;margin-bottom:28px;">A Barra Funda é terminal de integração — Linha 3-Vermelha (Metrô SP) + ViaMobilidade L8 + 139 linhas de ônibus municipais e intermunicipais. Fluxo estimado em ~60 mil passageiros/dia. O perfil vem da Pesquisa de Caracterização Metrô SP e da Pesquisa Origem-Destino 2023 (79 mil entrevistados — maior pesquisa de mobilidade da América Latina).</p>
+
+  <div class="table-wrap" style="margin-top:0;">
+    <table>
+      <thead>
+        <tr>
+          <th>Indicador</th>
+          <th>Dado</th>
+          <th>Fonte</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Classe social dominante</td><td><strong>74%</strong> classes B2 e C (Critério Brasil)</td><td class="mono" style="font-size:11px;color:var(--muted)">Pesquisa Caracterização, Metrô SP</td></tr>
+        <tr><td>Renda familiar média (2025)</td><td><strong>~R$ 6.800/mês</strong> (corrigido IPCA acumulado)</td><td class="mono" style="font-size:11px;color:var(--muted)">Pesquisa Caracterização / IPCA</td></tr>
+        <tr><td>Renda individual média (2025)</td><td><strong>~R$ 3.200/mês</strong></td><td class="mono" style="font-size:11px;color:var(--muted)">Pesquisa Caracterização / IPCA</td></tr>
+        <tr><td>Faixa de renda dominante</td><td><strong>37%</strong> têm renda familiar de 2 a 4 salários mínimos</td><td class="mono" style="font-size:11px;color:var(--muted)">Pesquisa Caracterização, Metrô SP</td></tr>
+        <tr><td>Escolaridade</td><td><strong>55%</strong> têm ensino médio como nível máximo</td><td class="mono" style="font-size:11px;color:var(--muted)">Pesquisa Caracterização, Metrô SP</td></tr>
+        <tr><td>Faixa etária 18–34 anos</td><td><strong>~59%</strong> dos passageiros</td><td class="mono" style="font-size:11px;color:var(--muted)">Pesquisa Caracterização, Metrô SP</td></tr>
+        <tr><td>Motivo de viagem: trabalho</td><td><strong>68%</strong></td><td class="mono" style="font-size:11px;color:var(--muted)">Pesquisa Caracterização, Metrô SP</td></tr>
+        <tr><td>Vínculo formal (CLT)</td><td><strong>71%</strong></td><td class="mono" style="font-size:11px;color:var(--muted)">Pesquisa Caracterização, Metrô SP</td></tr>
+        <tr><td>Frequência: 3+ dias/semana</td><td><strong>89%</strong></td><td class="mono" style="font-size:11px;color:var(--muted)">Pesquisa Caracterização, Metrô SP</td></tr>
+        <tr><td>Domicílios com internet (Classe C)</td><td><strong>91%</strong></td><td class="mono" style="font-size:11px;color:var(--muted)">TIC Domicílios 2023, CGI.br</td></tr>
+        <tr><td>Computador em lares Classe C</td><td><strong>42%</strong> — 58% sem desktop</td><td class="mono" style="font-size:11px;color:var(--muted)">TIC Domicílios 2023, CGI.br</td></tr>
+        <tr><td>Penetração de IA — ensino médio</td><td><strong>17%</strong> vs 59% em quem tem ensino superior</td><td class="mono" style="font-size:11px;color:var(--muted)">TIC Domicílios 2025, CGI.br</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="alert-box" style="margin-top:20px;">
+    <strong>O cruzamento que define o desafio</strong>
+    <p>59% entre 18–34 anos (faixa que lidera uso de IA), mas 55% com ensino médio como nível máximo — grupo no qual a penetração de IA é de apenas 17% (TIC Domicílios 2025, CGI.br). A campanha capta um público no qual a barreira não é só preço: é também percepção de utilidade e confiança no produto.</p>
+  </div>
+
+  <div class="label-tag" style="margin-top:40px;">Personas Mapeadas</div>
+  <div class="two-col">
+    <div class="persona">
+      <div class="persona-header">
+        <div class="persona-eyebrow">66,2% da base · 1.441 leads</div>
+        <div class="persona-name">Trabalhador Urbano Conectado</div>
+        <div class="persona-sub">Não assina nenhuma IA ainda</div>
+      </div>
+      <div class="persona-grid">
+        <div class="persona-item">
+          <label>Renda estimada</label>
+          <p>R$ 1.800–3.200/mês (classes C1 e C2)</p>
+        </div>
+        <div class="persona-item">
+          <label>Por que usa o Wi-Fi</label>
+          <p>Economia de dados — plano pré-pago ou com franquia limitada</p>
+        </div>
+        <div class="persona-item">
+          <label>Assinaturas típicas</label>
+          <p>Spotify familiar (~R$ 10), Netflix compartilhado (~R$ 8), YouTube sem Premium</p>
+        </div>
+        <div class="persona-item">
+          <label>Relação com IA</label>
+          <p>Usa ChatGPT gratuito; viu conteúdo de IA no TikTok/Reels; quer usar mas não pagaria R$ 100/mês</p>
+        </div>
+        <div class="persona-item">
+          <label>Barreira de compra</label>
+          <p>Preço recorrente no cartão, desconfiança sobre valor, limite de crédito baixo</p>
+        </div>
+        <div class="persona-item">
+          <label>O que compraria</label>
+          <p>Plano de R$ 14,90–R$ 24,90/mês, trial sem cartão via Pix, sem fidelidade</p>
+        </div>
+      </div>
+    </div>
+    <div class="persona">
+      <div class="persona-header">
+        <div class="persona-eyebrow">33,8% da base · 737 leads</div>
+        <div class="persona-name">Profissional Semi-Digital</div>
+        <div class="persona-sub">Já assina alguma plataforma de IA</div>
+      </div>
+      <div class="persona-grid">
+        <div class="persona-item">
+          <label>Renda estimada</label>
+          <p>R$ 3.000–6.000/mês (classes B2 e C1 alta)</p>
+        </div>
+        <div class="persona-item">
+          <label>Por que usa o Wi-Fi</label>
+          <p>Hábito ou velocidade — usa mesmo tendo dados</p>
+        </div>
+        <div class="persona-item">
+          <label>Assinaturas típicas</label>
+          <p>ChatGPT Free/Plus, Gemini, Notion — já tem rotina digital estabelecida</p>
+        </div>
+        <div class="persona-item">
+          <label>Relação com IA</label>
+          <p>Usa IA no trabalho, conhece o mercado, avalia Inner AI vs concorrentes racionalmente</p>
+        </div>
+        <div class="persona-item">
+          <label>Barreira de compra</label>
+          <p>Já paga por outra IA — precisa de razão concreta para migrar ou adicionar</p>
+        </div>
+        <div class="persona-item">
+          <label>O que compraria</label>
+          <p>Inner AI Lite se o preço estiver abaixo do ChatGPT Plus com diferenciais claros</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── SEÇÃO 4: CONTEXTO DE MERCADO ── -->
+<div class="section tinted" id="mercado">
+  <div class="label-tag">Contexto de Mercado</div>
+  <div class="s-title">Por que <em>R$ 49,90</em> é caro para este canal</div>
+
+  <div class="price-grid">
+    <div class="price-card">
+      <div class="price-product">Spotify Individual</div>
+      <div class="price-val">R$ 11,90</div>
+      <div class="price-ctx">líder em assinaturas na classe C</div>
+    </div>
+    <div class="price-card">
+      <div class="price-product">Netflix (1 tela)</div>
+      <div class="price-val">R$ 18,90</div>
+      <div class="price-ctx">plano mais acessível, amplamente adotado</div>
+    </div>
+    <div class="price-card">
+      <div class="price-product">YouTube Premium</div>
+      <div class="price-val">R$ 23,90</div>
+      <div class="price-ctx">maioria usa o gratuito — conversão difícil</div>
+    </div>
+    <div class="price-card highlight">
+      <div class="price-product">Inner AI Lite</div>
+      <div class="price-val red">R$ 49,90</div>
+      <div class="price-ctx">4,2× Spotify · 2,6× Netflix · entrada do produto</div>
+    </div>
+    <div class="price-card highlight">
+      <div class="price-product">Inner AI Pro</div>
+      <div class="price-val red">R$ 99,90</div>
+      <div class="price-ctx">8,4× Spotify · = Spotify + Netflix + YouTube Premium</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="content-card">
+      <h3>Poder de compra real — Classe C</h3>
+      <ul>
+        <li><strong>Classe C (FGV Social 2024):</strong> renda domiciliar R$ 2.525–R$ 10.885/mês. Faixa dominante no metrô: R$ 3.500–R$ 6.000.</li>
+        <li><strong>Envelope de lazer digital:</strong> família de classe C baixo (~R$ 2.500/mês) gasta R$ 125–200/mês total com cultura e lazer. Streaming de vídeo já consome R$ 18–35. Sobra de R$ 90–165 para todas as demais assinaturas.</li>
+        <li><strong>R$ 49,90 sobre esse envelope:</strong> representa 25–40% de toda a verba de lazer digital — uma decisão consciente de orçamento, não compra impulsiva.</li>
+        <li><strong>81% dos brasileiros</strong> já cancelaram assinatura por aumento de preço (Vindi 2024) — alta elasticidade-preço; "cancele quando quiser" é elemento decisivo.</li>
+      </ul>
+    </div>
+    <div class="content-card">
+      <h3>Assinantes streaming pago por classe</h3>
+      <ul>
+        <li><strong>Classes A/B:</strong> 70,5% de todos os 23,8 mi de assinantes pagantes</li>
+        <li><strong>Classe C:</strong> 26,6% dos assinantes</li>
+        <li><strong>Classe D:</strong> apenas 2,1%</li>
+        <li style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border)"><em style="font-style:normal;color:var(--black)">Fonte: Serasa Experian, jan/2024 — base 23,8 mi de CPFs.</em></li>
+        <li style="margin-top:4px;">A classe C já paga por assinaturas digitais — mas o teto de preço tolerado sem atrito fica em R$ 25–35/mês. Acima disso, a fricção no checkout aumenta significativamente.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="content-card" style="margin-top:14px;">
+    <h3>Penetração de IA por classe — TIC Domicílios 2025 (CGI.br/Cetic.br)</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-top:12px;">
+      <div style="text-align:center;padding:14px;background:var(--bg);">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:700;color:var(--black)">69%</div>
+        <div style="font-size:11px;color:var(--muted)">Classe A</div>
+      </div>
+      <div style="text-align:center;padding:14px;background:var(--bg);">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:700;color:var(--black)">58%</div>
+        <div style="font-size:11px;color:var(--muted)">Classes A/B</div>
+      </div>
+      <div style="text-align:center;padding:14px;background:var(--red-dim);border:1px solid rgba(229,36,32,.15)">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:700;color:var(--red)">16–29%</div>
+        <div style="font-size:11px;color:var(--muted)">Classes D/E</div>
+      </div>
+      <div style="text-align:center;padding:14px;background:var(--bg);">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:700;color:var(--black)">59%</div>
+        <div style="font-size:11px;color:var(--muted)">Ensino Superior</div>
+      </div>
+      <div style="text-align:center;padding:14px;background:var(--red-dim);border:1px solid rgba(229,36,32,.15)">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:700;color:var(--red)">17%</div>
+        <div style="font-size:11px;color:var(--muted)">Ensino Médio</div>
+      </div>
+      <div style="text-align:center;padding:14px;background:var(--bg);">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:700;color:var(--black)">32%</div>
+        <div style="font-size:11px;color:var(--muted)">Média geral internautas</div>
+      </div>
+    </div>
+    <p style="font-size:12px;color:var(--muted);margin-top:12px;">55% dos passageiros do metrô têm ensino médio como nível máximo → penetração de IA de apenas 17%. Barreira dupla: preço + utilidade percebida.</p>
+  </div>
+</div>
+
+<!-- ── SEÇÃO 6: RECOMENDAÇÕES DE PRODUTO ── -->
+<div class="section tinted" id="produto">
+  <div class="label-tag">Recomendações — Produto</div>
+  <div class="s-title">Mudanças de produto para <em>este canal</em></div>
+
+  <div class="rec-list">
+    <div class="rec-item">
+      <div class="rec-num red">1</div>
+      <div class="rec-body">
+        <h3>Plano de entrada a R$ 19,90–R$ 24,90/mês</h3>
+        <p>Criar um tier abaixo do Lite — "Plano Descoberta" ou "Plano Básico". Incluir: app mobile, 30–40 mensagens com modelos avançados, ilimitado com modelos rápidos, biblioteca de prompts básica. Âncora de preço comparada a Spotify, não a ChatGPT Plus. Limite de uso cria razão natural de upgrade sem prazo de expiração.</p>
+        <span class="rec-impact impact-hi">Impacto alto — remove principal bloqueio de preço</span>
+      </div>
+    </div>
+    <div class="rec-item">
+      <div class="rec-num">2</div>
+      <div class="rec-body">
+        <h3>Casos de uso do trabalhador — não do executivo</h3>
+        <p>Criar prompts e materiais específicos para: currículo e carta de apresentação, tradução de documentos, responder e-mails formais, preparar para entrevista de emprego, entender contrato de trabalho, calcular rescisão, redigir mensagens profissionais no WhatsApp. São os usos reais de quem ganha R$ 2.000/mês e usa o metrô todo dia.</p>
+        <span class="rec-impact impact-mid">Impacto médio — não requer mudança de produto, só posicionamento</span>
+      </div>
+    </div>
+    <div class="rec-item">
+      <div class="rec-num">3</div>
+      <div class="rec-body">
+        <h3>Pix Automático como método primário de billing</h3>
+        <p>Disponível desde jun/2025, o Pix Automático (recorrência) elimina a barreira de limite de cartão. 58% das pessoas com renda até 2 salários mínimos manifestaram interesse em Pix parcelado (Matera, 2025). Mencionar explicitamente na LP e no flow de checkout aumenta conversão de classe C/D sem mudar o produto.</p>
+        <span class="rec-impact impact-hi">Impacto alto — habilita segmento que não tem crédito disponível</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="f-logo">
+    <div class="logo-bars">
+      <div class="logo-bar"></div>
+      <div class="logo-bar"></div>
+    </div>
+    Trackfy
+  </div>
+  <p>ANÁLISE DE PÚBLICO — INNER AI × BARRA FUNDA · 17/08/2026<br>DADOS: TRACKFY-MIDIA.GITHUB.IO/INNERAI · LP.INNERAI.COM/NOSSOS-PLANOS-TF</p>
+</footer>
+
+</body>
+</html>
