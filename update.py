@@ -33,6 +33,11 @@ META_TOTAL      = 10_000
 PHASE1_CUTOFF   = date(2026, 8, 11)
 DAYS_IN_META    = 30  # meta/dia = META_TOTAL / DAYS_IN_META
 
+# Leads offline (Metro BF 45138 + CPTM 45132) — somados ao total WiFire
+OFFLINE_TOTAL   = 700
+OFFLINE_YES     = 213   # já assinam IA
+OFFLINE_NO      = 487   # não assinam IA
+
 ROOT       = Path(__file__).parent
 DATA_FILE  = ROOT / "data" / "campaign.json"
 HTML_FILES = [ROOT / "index.html", ROOT / "dash" / "index.html"]
@@ -165,7 +170,7 @@ def compute_kpis(state: dict, now: datetime) -> dict:
         })
         d += timedelta(days=1)
 
-    total    = cum
+    total    = cum + OFFLINE_TOTAL
     complete = [t for t in timeline if not t["partial"]]
     p1 = [t for t in complete if date.fromisoformat(t["date"]) <  PHASE1_CUTOFF]
     p2 = [t for t in complete if date.fromisoformat(t["date"]) >= PHASE1_CUTOFF]
@@ -181,7 +186,7 @@ def compute_kpis(state: dict, now: datetime) -> dict:
     gp           = round((a2 - a1) / a1 * 100) if a1 else 0
 
     seg       = state["seg"]
-    yes, no   = seg.get("yes", 0), seg.get("no", 0)
+    yes, no   = seg.get("yes", 0) + OFFLINE_YES, seg.get("no", 0) + OFFLINE_NO
     seg_total = max(yes + no, 1)
 
     p2_last = max((t["date"] for t in p2), default=None)
