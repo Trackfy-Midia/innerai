@@ -33,10 +33,21 @@ META_TOTAL      = 10_000
 PHASE1_CUTOFF   = date(2026, 8, 11)
 DAYS_IN_META    = 30  # meta/dia = META_TOTAL / DAYS_IN_META
 
-# Leads offline (Metro BF 45138 + CPTM 45132) — somados ao total WiFire
-OFFLINE_TOTAL   = 700
-OFFLINE_YES     = 213   # já assinam IA
-OFFLINE_NO      = 487   # não assinam IA
+# Leads offline (Metro BF 45138 + CPTM 45132) por data de cadastro
+# Atualizar ao importar novo export de Clientes
+OFFLINE_DAILY = {
+    "2026-08-06": 1,
+    "2026-08-08": 1,
+    "2026-08-10": 3,
+    "2026-08-12": 2,
+    "2026-08-13": 2,
+    "2026-08-14": 20,
+    "2026-08-15": 164,
+    "2026-08-16": 416,
+    "2026-08-17": 92,
+}
+OFFLINE_YES = 213   # já assinam IA (total fixo)
+OFFLINE_NO  = 488   # não assinam IA (total fixo)
 
 ROOT       = Path(__file__).parent
 DATA_FILE  = ROOT / "data" / "campaign.json"
@@ -157,7 +168,7 @@ def compute_kpis(state: dict, now: datetime) -> dict:
     d = CAMPAIGN_START
     while d <= today:
         ds  = d.isoformat()
-        n   = counts.get(ds, 0)
+        n   = counts.get(ds, 0) + OFFLINE_DAILY.get(ds, 0)
         cum += n
         meta_acc = min((d - CAMPAIGN_START).days + 1, DAYS_IN_META) * (META_TOTAL // DAYS_IN_META)
         timeline.append({
@@ -170,7 +181,7 @@ def compute_kpis(state: dict, now: datetime) -> dict:
         })
         d += timedelta(days=1)
 
-    total    = cum + OFFLINE_TOTAL
+    total    = cum
     complete = [t for t in timeline if not t["partial"]]
     p1 = [t for t in complete if date.fromisoformat(t["date"]) <  PHASE1_CUTOFF]
     p2 = [t for t in complete if date.fromisoformat(t["date"]) >= PHASE1_CUTOFF]
