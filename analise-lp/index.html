@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trackfy: Análise da LP Inner AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:       #F0EDE8;
+    --surface:  #E8E4DE;
+    --surface2: #DDD9D3;
+    --border:   #CECCCA;
+    --black:    #111111;
+    --red:      #E52420;
+    --red-dim:  rgba(229,36,32,0.07);
+    --red-mid:  rgba(229,36,32,0.18);
+    --muted:    #888880;
+    --dim:      #666660;
+    --white:    #ffffff;
+  }
+
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--black);
+    font-family: 'Barlow', sans-serif;
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  header {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo {
+    display: flex; align-items: center; gap: 10px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700; font-size: 20px;
+  }
+  .logo-bars { display:flex; gap:2px; align-items:flex-end; }
+  .logo-bar  { width:4px; background:var(--red); }
+  .logo-bar:nth-child(1) { height:14px; }
+  .logo-bar:nth-child(2) { height:10px; }
+  .header-meta {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; color: var(--muted);
+    letter-spacing: 0.07em; text-align:right; line-height:1.9;
+  }
+
+  nav {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 0 48px;
+    display: flex; gap:0;
+    position: sticky; top:0; z-index:100;
+  }
+  nav a {
+    font-size: 12px; font-weight:500; letter-spacing:0.04em;
+    color: var(--muted); text-decoration:none;
+    padding: 12px 20px 11px;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  nav a:hover { color: var(--black); }
+  nav a.active { color: var(--red); border-bottom-color: var(--red); }
+  nav a:first-child { padding-left:0; }
+
+  .divider-red {
+    width:100%; height:3px;
+    background: linear-gradient(90deg, var(--red) 0%, transparent 55%);
+  }
+
+  .section {
+    padding: 44px 48px;
+    border-bottom: 1px solid var(--border);
+    scroll-margin-top: 45px;
+  }
+  .section.white  { background: var(--white); }
+  .section.tinted { background: var(--bg); }
+
+  .label-tag {
+    font-size: 11px; font-weight:600;
+    letter-spacing:0.08em; text-transform:uppercase;
+    color: var(--red); margin-bottom:18px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .label-tag::before {
+    content:''; display:inline-block;
+    width:12px; height:2px; background:var(--red); flex-shrink:0;
+  }
+
+  .s-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight:800; font-size:clamp(22px,2.5vw,32px);
+    text-transform:uppercase; letter-spacing:-0.3px;
+    line-height:1; margin-bottom:20px;
+  }
+  .s-title em { color:var(--red); font-style:normal; }
+
+  .alert-box {
+    border-left: 3px solid var(--red);
+    padding: 16px 20px;
+    background: var(--red-dim);
+    margin-bottom: 20px;
+  }
+  .alert-box.warn {
+    border-left-color: var(--dim);
+    background: var(--surface);
+  }
+  .alert-box strong {
+    display:block; margin-bottom:6px;
+    font-size: 12px; font-weight:600;
+    letter-spacing:0.04em; text-transform:uppercase;
+    color: var(--red);
+  }
+  .alert-box.warn strong { color: var(--dim); }
+  .alert-box p { font-size:14px; color: var(--black); }
+
+  .badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; font-weight:600;
+    padding: 2px 7px; letter-spacing:0.06em;
+    text-transform:uppercase;
+  }
+  .badge-red   { background: var(--red-dim); color:var(--red); }
+  .badge-dim   { background: var(--surface2); color:var(--dim); }
+
+  /* UX ISSUE LIST */
+  .ux-list { margin-top:20px; display:flex; flex-direction:column; gap:12px; }
+  .ux-item {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--red);
+    padding: 14px 18px;
+  }
+  .ux-item.ok   { border-left-color: #006428; }
+  .ux-item.warn { border-left-color: var(--dim); }
+  .ux-title {
+    font-family: 'Barlow', sans-serif;
+    font-size:13px; font-weight:600;
+    margin-bottom:5px;
+  }
+  .ux-body { font-size:13px; color:var(--dim); line-height:1.5; }
+
+  /* PHASE BLOCK */
+  .phase-block {
+    background: var(--white);
+    border: 1px solid var(--border);
+    margin-bottom:14px;
+  }
+  .phase-header {
+    background: var(--surface);
+    padding: 10px 18px;
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .phase-header-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size:13px; font-weight:700;
+    text-transform:uppercase; letter-spacing:0.04em;
+  }
+  .phase-body { padding:18px; }
+  .phase-body ul { padding-left:16px; }
+  .phase-body ul li {
+    font-size:13px; color:var(--dim);
+    margin-bottom:8px; line-height:1.5;
+  }
+  .phase-body ul li strong { color:var(--black); }
+
+  footer {
+    background: var(--black); color: rgba(255,255,255,0.5);
+    padding: 24px 48px;
+    display:flex; justify-content:space-between; align-items:center;
+    flex-wrap:wrap; gap:12px;
+  }
+  footer .f-logo {
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700; font-size:16px; color:#fff;
+    display:flex; align-items:center; gap:8px;
+  }
+  footer p { font-family:'IBM Plex Mono', monospace; font-size:10px; letter-spacing:0.05em; }
+
+  @media(max-width:700px) {
+    header, nav, .section, footer { padding-left:20px; padding-right:20px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-bars">
+      <div class="logo-bar"></div>
+      <div class="logo-bar"></div>
+    </div>
+    Trackfy
+  </div>
+  <div class="header-meta">
+    ANÁLISE DE LP · 17/08/2026<br>
+    INNER AI × BARRA FUNDA · CAMPANHA CPL
+  </div>
+</header>
+
+<div class="divider-red"></div>
+
+<nav>
+  <a href="#lp">Análise da LP</a>
+  <a href="#ux">Recomendações UX</a>
+</nav>
+
+<!-- SEÇÃO 1: ANÁLISE DA LP -->
+<div class="section white" id="lp">
+  <div class="label-tag">Análise da Landing Page</div>
+  <div class="s-title">lp.innerai.com/<em>nossos-planos-tf</em></div>
+  <p style="font-size:14px;color:var(--dim);max-width:680px;margin-bottom:28px;">A LP foi construída para um público B2B-adjacent: executivos, profissionais que conhecem ChatGPT Plus, empresas comparando planos. O design, o copy e a prova social falam para esse público, não para o trabalhador da Barra Funda.</p>
+
+  <div class="ux-list">
+    <div class="ux-item">
+      <div class="ux-title">Design escuro e premium cria dissonância cognitiva</div>
+      <div class="ux-body">Fundo preto com gradientes azul-escuro sinaliza "produto de luxo/enterprise". Para o usuário que acabou de sair do captive portal de Wi-Fi gratuito no metrô, a transição é abrupta e cria a sensação de que entrou no lugar errado. A expectativa do canal (informal, acessível) não casa com o visual da LP (premium, corporativo).</div>
+    </div>
+    <div class="ux-item">
+      <div class="ux-title">Prova social é 100% enterprise: Embraer, Bayer, Claro, Movida</div>
+      <div class="ux-body">Nenhum depoimento de pessoa física, trabalhador, estudante ou autônomo. O lead do metrô não se vê representado. Quando o usuário não se reconhece no cliente típico do produto, a confiança cai antes do preço ser a objeção.</div>
+    </div>
+    <div class="ux-item">
+      <div class="ux-title">Compromisso mensal no cartão sem alternativas de pagamento</div>
+      <div class="ux-body">Não há menção a Pix, parcelamento, período gratuito de teste ou plano semanal. Classe C tem relação complexa com débito recorrente: medo de "esquecer de cancelar" e comprometer limite. O Pix Automático (disponível desde jun/2025) é o habilitador crítico que não está sendo explorado.</div>
+    </div>
+    <div class="ux-item">
+      <div class="ux-title">Hero não mostra o app mobile: principal diferencial para este público</div>
+      <div class="ux-body">Inner AI tem app mobile, "única plataforma multi-IA brasileira com aplicativo". Para o usuário de metrô que acessa tudo pelo celular (58% da classe C/D são mobile-only), isso é o diferencial número 1. O hero exibe composição de logos de IAs que o usuário não conhece.</div>
+    </div>
+    <div class="ux-item">
+      <div class="ux-title">CTA "Assine Agora" sem intermediário cria pressão de compromisso</div>
+      <div class="ux-body">Ausência total de CTA intermediário: "Começar grátis", "Experimentar 7 dias", "Ver demonstração". O único caminho é assinatura imediata. Para usuário que nunca ouviu falar da Inner AI, assinar no primeiro contato é barreira psicológica alta independente do preço.</div>
+    </div>
+    <div class="ux-item warn">
+      <div class="ux-title">Comparação com ChatGPT Plus pode não funcionar para 66% da base</div>
+      <div class="ux-body">O argumento "R$ 99,90 vs R$ 108,65 do ChatGPT Plus" assume que o usuário (a) conhece o ChatGPT Plus pago e (b) considera pagar por ele. Para o não-assinante do metrô, esse argumento é irrelevante: a referência de preço é Spotify (R$ 11,90), não ChatGPT Plus.</div>
+    </div>
+    <div class="ux-item ok">
+      <div class="ux-title">Garantia 14 dias existe: precisa de mais destaque</div>
+      <div class="ux-body">A garantia é o principal redutor de risco para conversão. Está presente mas não ocupa posição de destaque. Deve aparecer imediatamente abaixo do botão CTA, no mesmo viewport, não só no rodapé da seção de preços.</div>
+    </div>
+    <div class="ux-item ok">
+      <div class="ux-title">Suporte em português 7 dias é diferencial real: está enterrado</div>
+      <div class="ux-body">Para o usuário que nunca usou uma ferramenta de IA em inglês, suporte em pt-BR elimina a barreira de idioma. Vale destaque no topo da LP para este canal, não como 5º bullet de features.</div>
+    </div>
+  </div>
+</div>
+
+<!-- SEÇÃO 2: RECOMENDAÇÕES UX/LP -->
+<div class="section tinted" id="ux">
+  <div class="label-tag">Recomendações: UX / Landing Page</div>
+  <div class="s-title">Mudanças na LP para o <em>canal Trackfy</em></div>
+
+  <div class="alert-box warn" style="margin-bottom:24px;">
+    <strong>Premissa</strong>
+    <p>A LP /nossos-planos-tf já tem sufixo de canal. A Inner AI pode manter a LP genérica e criar uma variante /tf-metro customizada para este público sem afetar outros canais. Todas as recomendações abaixo são implementáveis numa LP variante.</p>
+  </div>
+
+  <div class="phase-block">
+    <div class="phase-header">
+      <span class="phase-header-title">Prioridade 1: Hero e primeiro scroll</span>
+      <span class="badge badge-red">Crítico</span>
+    </div>
+    <div class="phase-body">
+      <ul>
+        <li><strong>Trocar fundo escuro por fundo claro:</strong> fundo branco/creme sinaliza acessibilidade, não exclusividade. Fundo escuro funciona para quem já conhece a marca, não para primeira impressão de um lead de captive portal.</li>
+        <li><strong>Hero headline reposicionada:</strong> "Mais de 50 IAs no seu celular, por menos que um Spotify" — referência conhecida. Ou: "Sua IA pessoal. Em português. No bolso."</li>
+        <li><strong>Mostrar o app mobile no hero:</strong> printscreen do app em smartphone, não composição de logos de IAs que o usuário não reconhece.</li>
+        <li><strong>CTA intermediário:</strong> botão secundário "Ver demonstração grátis" ou "Como funciona em 60s" antes de "Assine Agora".</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="phase-block">
+    <div class="phase-header">
+      <span class="phase-header-title">Prioridade 2: Precificação e garantias</span>
+      <span class="badge badge-dim">Alto impacto</span>
+    </div>
+    <div class="phase-body">
+      <ul>
+        <li><strong>Plano de entrada visível como primeiro card:</strong> se existir um tier a R$ 19,90–R$ 24,90, deve ser o primeiro card, não o mais barato entre dois caros.</li>
+        <li><strong>Garantia 14 dias abaixo do CTA, no mesmo viewport:</strong> "Não gostou? Devolvemos 100% em 14 dias, sem perguntas." Deve estar junto ao botão, não enterrada embaixo.</li>
+        <li><strong>"Cancele quando quiser" em destaque:</strong> resolve a principal objeção de público C sobre assinaturas recorrentes.</li>
+        <li><strong>Pix como método de pagamento em destaque:</strong> símbolo do Pix na seção de pagamento elimina ansiedade de quem não confia em débito automático.</li>
+        <li><strong>Substituir comparação com ChatGPT Plus:</strong> "Por menos que uma saída no fim de semana, você tem +50 IAs disponíveis o mês inteiro."</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="phase-block">
+    <div class="phase-header">
+      <span class="phase-header-title">Prioridade 3: Prova social e confiança</span>
+      <span class="badge badge-dim">Médio impacto</span>
+    </div>
+    <div class="phase-body">
+      <ul>
+        <li><strong>Depoimentos de pessoas físicas:</strong> trabalhadores, autônomos, estudantes — "Uso para fazer currículo", "Me ajuda a responder e-mails em inglês", "Preparei minha entrevista". Nomes e fotos reais, não empresas.</li>
+        <li><strong>Mover logos corporativos para o rodapé:</strong> Embraer e Bayer criam distância psicológica. Funcionam como credencial institucional, não como prova social para o público do metrô.</li>
+        <li><strong>Nota do app stores em destaque:</strong> "4,9 estrelas no Google Play" com review de usuário real, muito mais relatable que parceiros corporativos.</li>
+        <li><strong>Seção de casos de uso pessoais:</strong> "O que você vai usar no dia a dia" com ícones simples: currículo, e-mail, pesquisa, cálculo, tradução. Não "Modo Agente" e "Integrações Gmail/Calendar".</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="phase-block">
+    <div class="phase-header">
+      <span class="phase-header-title">Prioridade 4: Copy e posicionamento</span>
+      <span class="badge badge-dim">Médio impacto</span>
+    </div>
+    <div class="phase-body">
+      <ul>
+        <li><strong>Trocar "Dobre sua produtividade" por algo tangível:</strong> "Economize 2h por semana em tarefas que qualquer IA faz por você" — horas são concretas, produtividade é abstrata.</li>
+        <li><strong>Suporte em português no topo:</strong> para usuário que nunca usou IA em inglês, suporte 7 dias em pt-BR é o diferencial principal, não o 5º bullet.</li>
+        <li><strong>Reescrever FAQ com as dúvidas reais deste público:</strong> "Precisa de cartão?", "Posso cancelar pelo celular?", "Funciona no Android?", "Meus dados ficam seguros?", "Como uso na prática?" — não "Tenho acesso ao ChatGPT pago?"</li>
+        <li><strong>WhatsApp como canal principal de suporte em destaque:</strong> o botão flutuante já existe — torná-lo parte do CTA para este canal: "Dúvidas? Fale agora no WhatsApp".</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="f-logo">
+    <div class="logo-bars">
+      <div class="logo-bar"></div>
+      <div class="logo-bar"></div>
+    </div>
+    Trackfy
+  </div>
+  <p>ANÁLISE DE LP: INNER AI × BARRA FUNDA · 17/08/2026<br>TRACKFY-MIDIA.GITHUB.IO/INNERAI · LP.INNERAI.COM/NOSSOS-PLANOS-TF</p>
+</footer>
+
+<script>
+(function(){
+  var navLinks = document.querySelectorAll('nav a');
+  var sections = Array.from(navLinks).map(function(a){
+    return document.querySelector(a.getAttribute('href'));
+  });
+
+  function setActive(id){
+    navLinks.forEach(function(a){
+      a.classList.toggle('active', a.getAttribute('href') === '#' + id);
+    });
+  }
+
+  navLinks.forEach(function(a){
+    a.addEventListener('click', function(){
+      setActive(a.getAttribute('href').slice(1));
+    });
+  });
+
+  var observer = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting) setActive(entry.target.id);
+    });
+  }, { rootMargin: '-40px 0px -60% 0px', threshold: 0 });
+
+  sections.forEach(function(s){ if(s) observer.observe(s); });
+})();
+</script>
+</body>
+</html>
