@@ -2209,6 +2209,10 @@
     const values = [63,57,64,60,90,190,268,350,335,374,548,323,22];
     const isPhase2 = [false,false,false,false,false,true,true,true,true,true,true,true,true];
 
+    var peakVal = Math.max.apply(null, values);
+    var yMax    = Math.ceil(peakVal / 100) * 100;
+    var yStep   = yMax <= 400 ? 100 : yMax <= 700 ? 150 : 200;
+
     new Chart(ctx, {
       type: 'bar',
       data: {
@@ -2269,12 +2273,12 @@
           },
           y: {
             min: 0,
-            max: 360,
+            max: yMax,
             grid: { color: 'rgba(0,0,0,0.05)' },
             ticks: {
               font: { family: 'Barlow', size: 10 },
               color: '#888880',
-              stepSize: 90
+              stepSize: yStep
             },
             border: { color: '#CECCCA' }
           }
