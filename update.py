@@ -35,25 +35,30 @@ DAYS_IN_META    = 30  # meta/dia = META_TOTAL / DAYS_IN_META
 
 # Leads offline (Metro BF 45138 + CPTM 45132) por data de cadastro
 # Atualizar ao importar novo export de Clientes
-# Última importação: 2026-08-19 (export Clientes combinado CPTM+Metro)
+# Última importação: 2026-08-24 (export Clientes (18-21) — CPTM+Metro BF)
 OFFLINE_DAILY = {
     "2026-08-06": 1,
-    "2026-08-07": 1,
-    "2026-08-08": 2,
+    "2026-08-07": 2,
+    "2026-08-08": 3,
     "2026-08-09": 1,
-    "2026-08-10": 3,
-    "2026-08-11": 1,
-    "2026-08-12": 4,
-    "2026-08-13": 5,
-    "2026-08-14": 38,
-    "2026-08-15": 177,
-    "2026-08-16": 416,
-    "2026-08-17": 418,
-    "2026-08-18": 340,
-    "2026-08-19": 216,
+    "2026-08-10": 4,
+    "2026-08-11": 2,
+    "2026-08-12": 7,
+    "2026-08-13": 6,
+    "2026-08-14": 56,
+    "2026-08-15": 189,
+    "2026-08-16": 402,
+    "2026-08-17": 396,
+    "2026-08-18": 308,
+    "2026-08-19": 349,
+    "2026-08-20": 305,
+    "2026-08-21": 330,
+    "2026-08-22": 298,
+    "2026-08-23": 283,
+    "2026-08-24": 48,
 }
-OFFLINE_YES = 470   # já assinam IA (total fixo)
-OFFLINE_NO  = 1153  # não assinam IA (total fixo)
+OFFLINE_YES = 898   # já assinam IA (total fixo)
+OFFLINE_NO  = 2092  # não assinam IA (total fixo)
 
 ROOT       = Path(__file__).parent
 DATA_FILE  = ROOT / "data" / "campaign.json"
