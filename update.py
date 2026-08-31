@@ -64,8 +64,9 @@ OFFLINE_DAILY = {
     "2026-08-30": 298,
     "2026-08-31":  84,
 }
-OFFLINE_YES = 1376  # já assinam IA (total fixo)
-OFFLINE_NO  = 3565  # não assinam IA (total fixo)
+OFFLINE_YES  = 1376  # já assinam IA (total fixo)
+OFFLINE_NO   = 3565  # não assinam IA (total fixo)
+BASE03_EXTRA = 550   # leads BASE 03 (conversão pré-campanha jun-jul/26, não contados na janela WiFire)
 
 ROOT       = Path(__file__).parent
 DATA_FILE  = ROOT / "data" / "campaign.json"
@@ -199,7 +200,7 @@ def compute_kpis(state: dict, now: datetime) -> dict:
         })
         d += timedelta(days=1)
 
-    total    = cum
+    total    = cum + BASE03_EXTRA
     complete = [t for t in timeline if not t["partial"]]
     p1 = [t for t in complete if date.fromisoformat(t["date"]) <  PHASE1_CUTOFF]
     p2 = [t for t in complete if date.fromisoformat(t["date"]) >= PHASE1_CUTOFF]
@@ -229,7 +230,7 @@ def compute_kpis(state: dict, now: datetime) -> dict:
 
     pct       = total / META_TOTAL * 100
     last_ci   = len(complete) - 1
-    proj_base = timeline[last_ci]["cumulative"] if last_ci >= 0 else 0
+    proj_base = timeline[last_ci]["cumulative"] + BASE03_EXTRA if last_ci >= 0 else BASE03_EXTRA
 
     accel_labels = [t["date"][8:] + "/" + t["date"][5:7] for t in timeline]
     is_p2        = [date.fromisoformat(t["date"]) >= PHASE1_CUTOFF for t in timeline]
