@@ -600,7 +600,7 @@ def update_html(path: Path, k: dict):
     # update consolidado via _DS renderer (skip direct replacement here)
 
     path.write_text(html, "utf-8")
-    print(f"  ✓ {path.name}")
+    print(f"  OK {path.name}")
 
 
 # ── MAIN ─────────────────────────────────────────────────────
